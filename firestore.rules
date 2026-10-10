@@ -5,6 +5,39 @@ service cloud.firestore {
       allow read: if true;
       allow write: if false;
     }
+    match /orders/{orderId} {
+      function validItem(items, index) {
+        return items.size() <= index || (
+          items[index] is map && items[index].keys().hasOnly(['id', 'name', 'price', 'quantity']) &&
+          items[index].keys().hasAll(['id', 'name', 'price', 'quantity']) &&
+          items[index].id is string && items[index].id.matches('^[0-9]{1,3}$') &&
+          items[index].quantity is int && items[index].quantity >= 1 && items[index].quantity <= 99 &&
+          items[index].price is number && items[index].price >= 0 &&
+          items[index].price == get(/databases/$(database)/documents/products/$(items[index].id)).data.price &&
+          items[index].name == get(/databases/$(database)/documents/products/$(items[index].id)).data.name
+        );
+      }
+      function amount(items, index) {
+        return items.size() <= index ? 0 : items[index].price * items[index].quantity;
+      }
+      allow create: if request.resource.data.keys().hasOnly(['buyer', 'items', 'total', 'createdAt', 'status']) &&
+        request.resource.data.keys().hasAll(['buyer', 'items', 'total', 'createdAt', 'status']) &&
+        request.resource.data.status == 'demo' && request.resource.data.createdAt == request.time &&
+        request.resource.data.buyer is map && request.resource.data.buyer.keys().hasOnly(['name', 'email']) &&
+        request.resource.data.buyer.keys().hasAll(['name', 'email']) &&
+        request.resource.data.buyer.name is string && request.resource.data.buyer.name.size() >= 2 && request.resource.data.buyer.name.size() <= 100 &&
+        request.resource.data.buyer.email is string && request.resource.data.buyer.email.size() <= 200 &&
+        request.resource.data.buyer.email.matches('^[^ ]+@[^ ]+[.][^ ]+$') &&
+        request.resource.data.items is list && request.resource.data.items.size() >= 1 && request.resource.data.items.size() <= 9 &&
+        validItem(request.resource.data.items, 0) && validItem(request.resource.data.items, 1) && validItem(request.resource.data.items, 2) &&
+        validItem(request.resource.data.items, 3) && validItem(request.resource.data.items, 4) && validItem(request.resource.data.items, 5) &&
+        validItem(request.resource.data.items, 6) && validItem(request.resource.data.items, 7) && validItem(request.resource.data.items, 8) &&
+        request.resource.data.total is number && request.resource.data.total ==
+          amount(request.resource.data.items, 0) + amount(request.resource.data.items, 1) + amount(request.resource.data.items, 2) +
+          amount(request.resource.data.items, 3) + amount(request.resource.data.items, 4) + amount(request.resource.data.items, 5) +
+          amount(request.resource.data.items, 6) + amount(request.resource.data.items, 7) + amount(request.resource.data.items, 8);
+      allow read, update, delete: if false;
+    }
     match /{document=**} {
       allow read, write: if false;
     }

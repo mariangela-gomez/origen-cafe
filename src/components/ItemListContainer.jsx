@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import Item from './Item';
 import { getProducts } from '../services/products';
 
@@ -18,7 +19,8 @@ function updateProperty(property, content) {
 
 export default function ItemListContainer() {
   const [products, setProducts] = useState([]);
-  const [activeCategory, setActiveCategory] = useState('Todos');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const requestedCategory = searchParams.get('categoria') || 'Todos';
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [attempt, setAttempt] = useState(0);
@@ -39,12 +41,13 @@ export default function ItemListContainer() {
   }, [attempt]);
 
   const categories = ['Todos', ...new Set(products.map((product) => product.category))];
+  const activeCategory = categories.includes(requestedCategory) ? requestedCategory : 'Todos';
   const visibleProducts = activeCategory === 'Todos' ? products : products.filter((product) => product.category === activeCategory);
 
   return (
     <section className="catalog-page container">
       <div className="page-intro"><h1>Elegí tu próximo<br /><em>café favorito.</em></h1><p className="intro-copy">Granos, café molido y cápsulas para disfrutar una buena taza todos los días.</p></div>
-      <div className="catalog-toolbar"><div className="filters">{categories.map((category) => <button type="button" key={category} onClick={() => setActiveCategory(category)} className={activeCategory === category ? 'filter active' : 'filter'}>{category}</button>)}</div><span className="results-count">{visibleProducts.length} piezas</span></div>
+      <div className="catalog-toolbar"><div className="filters">{categories.map((category) => <button type="button" key={category} aria-pressed={activeCategory === category} onClick={() => setSearchParams(category === 'Todos' ? {} : { categoria: category })} className={activeCategory === category ? 'filter active' : 'filter'}>{category}</button>)}</div><span className="results-count">{visibleProducts.length} {visibleProducts.length === 1 ? 'café' : 'cafés'}</span></div>
       {loading ? <div className="loading" role="status">Cargando la colección...</div> : error ? <div role="alert"><p>No pudimos cargar la colección. Revisá tu conexión.</p><button className="primary-button" onClick={() => setAttempt(attempt + 1)}>Reintentar</button></div> : !visibleProducts.length ? <p>No hay cafés disponibles en esta categoría.</p> : <div className="product-grid">{visibleProducts.map((product) => <Item product={product} key={product.id} />)}</div>}
     </section>
   );

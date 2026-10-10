@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import ItemCount from '../components/ItemCount';
@@ -5,6 +6,7 @@ const money = (value) => '$ ' + value.toLocaleString('es-AR');
 
 export default function Cart() {
   const { cart, removeItem, updateQuantity, clearCart, totalQuantity, totalPrice, storageError } = useCart();
+  useEffect(() => { document.title = 'Tu carrito | Origen Café'; }, []);
   if (!cart.length) return <section className="empty-page container"><h1>El carrito está<br /><em>esperando.</em></h1><p>Elegí tus aromas favoritos y armá una selección para hacer de tu casa un lugar más cálido.</p><Link to="/productos" className="primary-button">Volver a la colección <span>→</span></Link></section>;
   return <section className="cart-page container">
     <div className="cart-heading"><h1>Tu selección de café.</h1><Link className="back-link" to="/productos">Seguir comprando →</Link></div>
@@ -15,6 +17,6 @@ export default function Cart() {
       <ItemCount quantity={item.quantity} onChange={(quantity) => updateQuantity(item.id, quantity)} name={item.name} />
       <strong className="cart-line-total">{money(item.price * item.quantity)}</strong>
     </li>)}</ul><button type="button" className="cart-text-button clear-cart" onClick={clearCart}>Vaciar carrito</button></div>
-    <aside className="cart-summary" aria-label="Resumen del carrito"><h2>Resumen</h2><div><span>Unidades</span><span>{totalQuantity}</span></div><div className="cart-grand-total" aria-live="polite"><span>Total de productos</span><strong>{money(totalPrice)}</strong></div><p>El total corresponde a los productos seleccionados. El envío se calcula al finalizar la compra.</p><p className="checkout-note">Próximamente podrás finalizar tu compra desde aquí.</p></aside></div>
+    <aside className="cart-summary" aria-label="Resumen del carrito"><h2>Resumen</h2><div><span>Unidades</span><span>{totalQuantity}</span></div><div className="cart-grand-total" aria-live="polite"><span>Total de productos</span><strong>{money(totalPrice)}</strong></div><p>El total corresponde a los productos seleccionados. No incluye el costo de envío.</p><Link className="primary-button" to="/finalizar-compra">Continuar con mi pedido <span>→</span></Link></aside></div>
   </section>;
 }
