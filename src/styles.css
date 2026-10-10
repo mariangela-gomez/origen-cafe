@@ -120,3 +120,38 @@ h1,h2,h3,.hero h1,.home-hero-copy h1,.section-intro h2,.favorites-heading h2,.st
 .detail-image { height:560px; padding:28px; }
 .detail-image img { object-fit:contain; }
 @media (max-width:800px) { .detail-image { height:420px; padding:18px; } }
+
+/* Carrito: conserva la paleta y la tipografía de Origen Café. */
+.cart-page { padding:64px 0 90px; }
+.cart-heading { display:flex; justify-content:space-between; align-items:center; gap:24px; margin-bottom:40px; }
+.cart-heading h1 { font-size:clamp(36px,4vw,56px); letter-spacing:-.03em; margin:0; }
+.cart-layout { display:grid; grid-template-columns:minmax(0,1fr) 300px; gap:48px; align-items:start; }
+.cart-items { list-style:none; margin:0; padding:0; }
+.cart-row { display:grid; grid-template-columns:100px minmax(0,1fr) auto; align-items:center; gap:20px; padding:24px 0; border-bottom:1px solid var(--line); }
+.cart-row:first-child { padding-top:0; }
+.cart-image { grid-row:span 2; background:var(--cyan); border-radius:12px; }
+.cart-image img { display:block; width:100%; height:130px; object-fit:contain; padding:8px; }
+.cart-product { min-width:0; }
+.cart-product h2 { font-family:var(--sans); font-weight:600; font-size:17px; margin:0 0 8px; overflow-wrap:anywhere; }
+.cart-product p { font-size:14px; color:var(--muted); margin:0 0 8px; }
+.cart-text-button { background:transparent; border:0; color:var(--primary); padding:4px 0; text-decoration:underline; text-underline-offset:4px; cursor:pointer; font-size:14px; }
+.clear-cart { margin-top:24px; }
+.cart-line-total { grid-column:3; text-align:right; font-variant-numeric:tabular-nums; }
+.quantity-control { display:inline-flex; align-items:center; border:1px solid var(--primary); border-radius:10px; overflow:hidden; width:max-content; }
+.quantity-control button { min-width:44px; min-height:44px; border:0; background:transparent; color:var(--ink); font-size:22px; cursor:pointer; }
+.quantity-control button:hover:not(:disabled) { background:var(--cyan); }
+.quantity-control button:disabled { opacity:.4; cursor:default; }
+.quantity-control output { padding:0 8px; min-width:32px; text-align:center; font-variant-numeric:tabular-nums; }
+.cart-summary { border-top:2px solid var(--primary); padding-top:24px; }
+.cart-summary h2 { font-size:30px; margin-bottom:24px; }
+.cart-summary > div { display:flex; justify-content:space-between; gap:20px; margin-bottom:20px; font-size:16px; font-variant-numeric:tabular-nums; }
+.cart-grand-total { border-top:1px solid var(--line); padding-top:20px; flex-wrap:wrap; }
+.cart-summary p { color:var(--muted); font-size:14px; line-height:1.65; }
+.checkout-note { margin-top:28px; }
+.detail-purchase > p:first-child { font-size:14px; margin-bottom:12px; }
+.detail-purchase .quantity-control { margin-bottom:24px; }
+.detail-purchase .primary-button { display:flex; }
+.cart-feedback { min-height:22px; margin:16px 0 8px; color:var(--ink); font-size:14px; }
+.cart-page :focus-visible,.detail-page :focus-visible { outline:3px solid var(--primary); outline-offset:4px; }
+@media (max-width:800px) { .cart-layout { grid-template-columns:1fr; gap:40px; }.cart-heading { align-items:flex-start; flex-direction:column; }.cart-summary { max-width:none; } }
+@media (max-width:480px) { .cart-row { grid-template-columns:76px minmax(0,1fr); gap:14px; }.cart-image img { height:110px; }.cart-row .quantity-control { grid-column:2; }.cart-line-total { grid-column:2; text-align:left; }.cart-page { padding-top:40px; } }

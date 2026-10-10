@@ -1,6 +1,8 @@
 import { Link, NavLink } from 'react-router-dom';
+import { useCart } from '../context/CartContext';
 
 export default function Header() {
+  const { totalQuantity } = useCart();
   return (
     <header className="site-header">
       <div className="announcement">Envíos gratis a partir de $80.000 <span>·</span> Café tostado con amor</div>
@@ -11,7 +13,7 @@ export default function Header() {
           <NavLink to="/productos" className={({ isActive }) => isActive ? 'active' : ''}>Tienda</NavLink>
           <NavLink to="/carrito" className={({ isActive }) => isActive ? 'active' : ''}>Carrito</NavLink>
         </nav>
-        <Link to="/carrito" className="cart-pill" aria-label="Ver carrito">🛒 <span>0</span></Link>
+        <Link to="/carrito" className="cart-pill" aria-label={`Ver carrito, ${totalQuantity} ${totalQuantity === 1 ? "unidad" : "unidades"}`}>🛒 <span aria-live="polite">{totalQuantity}</span></Link>
       </div>
     </header>
   );
