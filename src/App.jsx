@@ -8,6 +8,9 @@ import ItemListContainer from './components/ItemListContainer';
 import ItemDetail from './components/ItemDetail';
 import Cart from './pages/Cart';
 import NotFound from './pages/NotFound';
+import AdminProducts from './pages/AdminProducts';
+import AuthPage from './pages/AuthPage';
+import ProtectedRoute from './components/ProtectedRoute';
 
 export default function App() {
   const { pathname, hash } = useLocation();
@@ -27,6 +30,9 @@ export default function App() {
         <Route path="/pedidos-y-entregas" element={<Information section="pedidos" />} />
         <Route path="/privacidad" element={<Information section="privacidad" />} />
         <Route path="/contacto" element={<Information section="contacto" />} />
+        <Route path="/login" element={<AuthPage />} />
+        <Route path="/registro" element={<AuthPage mode="register" />} />
+        <Route path="/admin/productos" element={<ProtectedRoute><AdminProducts /></ProtectedRoute>} />
         <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>
