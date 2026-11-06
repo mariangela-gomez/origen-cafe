@@ -44,3 +44,27 @@ export function updateProduct(id, values) {
 export function deleteProduct(id) {
   return deleteDoc(doc(db, 'products', String(id)));
 }
+
+const MAX_IMAGE_SIDE = 800;
+const MAX_IMAGE_CHARS = 450000;
+
+// Reduce la imagen elegida y la devuelve como data URL (se guarda dentro del producto en Firestore).
+export async function resizeImage(file) {
+  if (!file.type.startsWith('image/')) throw new Error('El archivo debe ser una imagen.');
+  if (file.size > 15 * 1024 * 1024) throw new Error('La imagen es demasiado grande (máximo 15 MB).');
+  const bitmap = await createImageBitmap(file).catch(() => { throw new Error('No pudimos leer la imagen.'); });
+  let scale = Math.min(1, MAX_IMAGE_SIDE / Math.max(bitmap.width, bitmap.height));
+  for (let attempt = 0; attempt < 4; attempt += 1) {
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.max(1, Math.round(bitmap.width * scale));
+    canvas.height = Math.max(1, Math.round(bitmap.height * scale));
+    canvas.getContext('2d').drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+    for (const quality of [0.8, 0.65, 0.5]) {
+      const url = canvas.toDataURL('image/webp', quality);
+      if (url.length <= MAX_IMAGE_CHARS) { bitmap.close?.(); return url; }
+    }
+    scale *= 0.75;
+  }
+  bitmap.close?.();
+  throw new Error('No pudimos reducir la imagen lo suficiente. Probá con otra.');
+}

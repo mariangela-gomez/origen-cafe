@@ -6,7 +6,8 @@ service cloud.firestore {
       allow read: if true;
       allow create, update: if request.auth != null && productId.matches('^[0-9]{1,3}$') &&
         request.resource.data.name is string && request.resource.data.name.size() >= 2 && request.resource.data.name.size() <= 100 &&
-        request.resource.data.category is string && request.resource.data.price is int && request.resource.data.price > 0 && request.resource.data.price <= 10000000;
+        request.resource.data.category is string && request.resource.data.price is int && request.resource.data.price > 0 && request.resource.data.price <= 10000000 &&
+        request.resource.data.image is string && request.resource.data.image.size() <= 600000;
       allow delete: if request.auth != null;
     }
     match /orders/{orderId} {

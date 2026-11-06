@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import FormField from '../components/FormField';
 import { getProducts } from '../services/products';
-import { createProduct, deleteProduct, emptyProduct, updateProduct, validateProduct } from '../services/adminProducts';
+import { createProduct, deleteProduct, emptyProduct, resizeImage, updateProduct, validateProduct } from '../services/adminProducts';
 
 function friendlyError(failure) {
   if (failure?.code === 'permission-denied') return 'Firestore no permite modificar productos con las reglas actuales (permission-denied).';
@@ -23,6 +23,13 @@ export default function AdminProducts() {
 
   const reset = () => { setValues(emptyProduct); setEditingId(null); setErrors({}); };
   const onChange = event => { const { name, value } = event.target; setValues(previous => ({ ...previous, [name]: value })); setErrors(previous => ({ ...previous, [name]: '' })); };
+
+  const onImage = async event => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    try { const image = await resizeImage(file); setValues(previous => ({ ...previous, image })); setErrors(previous => ({ ...previous, image: '' })); }
+    catch (failure) { setErrors(previous => ({ ...previous, image: failure.message })); event.target.value = ''; }
+  };
 
   const onEdit = product => {
     setEditingId(product.id); setMessage(''); setError(''); setErrors({});
@@ -55,14 +62,14 @@ export default function AdminProducts() {
 
   return <section className="container admin-page">
     <h1>Administrar productos</h1>
-    <p>Agregá, editá o eliminá productos de la colección <code>products</code> de Firestore.</p>
+    <p>Agregá, editá o eliminá productos.</p>
     <form className="checkout-form admin-form" onSubmit={onSubmit} noValidate>
       <h2>{editingId ? `Editar producto ${editingId}` : 'Nuevo producto'}</h2>
       <fieldset disabled={busy}>
         <FormField name="name" label="Nombre" maxLength={100} value={values.name} error={errors.name} onChange={onChange} />
         <FormField name="category" label="Categoría" placeholder="Ej.: Granos" maxLength={50} value={values.category} error={errors.category} onChange={onChange} />
         <FormField name="price" label="Precio" type="number" min="1" step="1" value={values.price} error={errors.price} onChange={onChange} />
-        <FormField name="image" label="Imagen (ruta)" value={values.image} error={errors.image} onChange={onChange} />
+        <div className="form-field image-field"><label htmlFor="image">Imagen</label><input id="image" name="image" type="file" accept="image/*" onChange={onImage} aria-invalid={Boolean(errors.image)} aria-describedby={errors.image ? 'image-error' : undefined} />{values.image && <img src={values.image} alt="Vista previa" className="image-preview" />}{errors.image && <p className="field-error" id="image-error">{errors.image}</p>}</div>
         <FormField name="tag" label="Etiqueta" maxLength={30} value={values.tag} onChange={onChange} />
         <FormField name="color" label="Perfil de taza" maxLength={100} value={values.color} onChange={onChange} />
         <FormField name="description" label="Descripción" maxLength={500} value={values.description} onChange={onChange} />

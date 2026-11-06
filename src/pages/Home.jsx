@@ -4,9 +4,9 @@ import { getProducts } from '../services/products';
 import ProductActions from '../components/ProductActions';
 
 const categories = [
-  { category: 'En grano', name: 'Café en grano', image: '/cafe-colombia-especialidad-origen.png' },
-  { category: 'Molido', name: 'Café molido', image: '/cafe-molido-tradicional-origen.png' },
-  { category: 'Cápsulas', name: 'Café en cápsulas', image: '/capsulas-compatibles-nespresso-origen.png' },
+  { category: 'En grano', name: 'Café en grano', image: '/cafe-colombia-especialidad-origen.webp' },
+  { category: 'Molido', name: 'Café molido', image: '/cafe-molido-tradicional-origen.webp' },
+  { category: 'Cápsulas', name: 'Café en cápsulas', image: '/capsulas-compatibles-nespresso-origen.webp' },
 ];
 
 function updateMeta(name, content) {
