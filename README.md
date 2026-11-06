@@ -1,52 +1,52 @@
-# Origen Café — Pre-entrega React JS
+# Origen Café
 
-Tienda de café de especialidad desarrollada para la pre-entrega de React JS.
+Tienda online de café de especialidad, hecha con React como proyecto final del curso de React JS.
 
 Desarrollado por **Mariangela Gómez**.
 
-## Incluye
+**Sitio publicado:** https://origen-cafe-three.vercel.app
 
-- Layout con Header, navegación y Footer.
-- Catálogo consultado en Cloud Firestore mediante el SDK de Firebase.
-- Componentes reutilizables `Item` e `ItemDetail`.
-- Rutas con `react-router-dom` para inicio, productos, detalle y carrito.
-- Diseño responsive con CSS nativo.
-- Footer con información de Origen Café, contacto y tarjetas del equipo.
+## Qué incluye
 
-## Ejecutar localmente
+- **Catálogo** cargado desde Cloud Firestore, con filtro por categoría, búsqueda en tiempo real y paginador.
+- **Detalle de producto** y **carrito** con Context API (agregar, quitar, cambiar cantidades y vaciar). El carrito se guarda en `localStorage`.
+- **Finalizar compra** con un formulario controlado y validado. Antes de guardar el pedido se verifican los precios actuales en Firestore.
+- **Registro e inicio de sesión** con Firebase Authentication, manejados desde un `AuthContext`.
+- **Panel de productos** (`/admin/productos`), protegido: solo entra quien inició sesión. Permite crear, editar y eliminar productos, con validaciones y una confirmación antes de borrar.
+- **Subida de imágenes** desde el panel. La foto se reduce a 800 px y se convierte a WebP antes de guardarse.
+- Mensajes de carga y de error cuando falla la conexión con Firebase.
+- Diseño responsive con CSS nativo, incluido un menú hamburguesa en móvil.
+
+## Tecnologías
+
+React, Vite, React Router, Firebase (Firestore y Authentication) y CSS nativo. Desplegado en Vercel.
+
+## Ejecutar en local
 
 ```bash
-pnpm install
-pnpm dev
+npm install
+npm run dev
 ```
 
-También se puede utilizar `npm install` y `npm run dev` si Node/npm está configurado correctamente.
+La configuración de Firebase está en `src/services/firebase.js`. Son datos públicos de la app web; la seguridad la controlan las reglas de Firestore.
 
-## Carrito con Context API
+## Estructura
 
-CartProvider envuelve la aplicación. Header, ItemDetail y Cart acceden al estado mediante useCart, sin pasar el carrito por componentes intermedios (prop drilling).
+```
+src/
+  components/   Header, Footer, Item, ItemDetail, ItemListContainer, formularios y ProtectedRoute
+  context/      CartContext y AuthContext
+  pages/        Home, Cart, Checkout, AuthPage (login y registro), AdminProducts, Información y NotFound
+  services/     Conexión con Firebase: productos, pedidos y administración
+data/           products.seed.json, copia de los productos iniciales (la app no la usa)
+```
 
-- addItem(product, quantity): agrega y acumula unidades sin duplicar filas.
-- removeItem(id), updateQuantity(id, quantity), clearCart(), isInCart(id).
-- totalQuantity y totalPrice se calculan a partir del carrito.
-- Renderización condicional del carrito vacío, productos, enlace al carrito y mensajes de carga/error.
-- Persistencia en localStorage; no es una base de datos ni crea pedidos.
-- ItemCount reutiliza el selector de unidades en detalle, carrito, tienda y favoritos del inicio.
+## Firebase
 
-## Firebase y Cloud Firestore
+Proyecto `origen-cafe-8e14f`, plan gratuito Spark. Las reglas están en `firestore.rules`:
 
-Proyecto: origen-cafe-8e14f. La configuración pública está en src/services/firebase.js. El catálogo se consulta en la colección products; cada documento usa el ID del producto (1, 2, 3, 7, 8, 9, 10, 11, 12). Los IDs de Firestore son cadenas. getProducts consulta la colección y getProduct consulta directamente un documento. No hay fallback a JSON: un fallo de Firebase muestra un error recuperable.
+- **`products`:** lectura pública. Crear, editar y eliminar requiere haber iniciado sesión, y se valida el id, el nombre, la categoría, el precio (mayor que 0) y el tamaño de la imagen.
+- **`orders`:** solo se pueden crear pedidos de demostración, y las reglas comprueban productos, precios, cantidades y total contra el catálogo. No se pueden leer, editar ni borrar desde la app.
+- Todo lo demás está cerrado.
 
-Campos: name, category, price (número), tag, color, description, image y alt. Las imágenes siguen en public; Firestore guarda sus rutas. data/products.seed.json es una copia de migración que Vite no publica. El sitio no consulta ese archivo.
-
-firestore.rules permite leer products y crear pedidos de demostración en orders. Las reglas verifican los productos, nombres, precios, cantidades y total contra el catálogo. Los pedidos no permiten lectura, edición ni borrado desde la aplicación. El resto de colecciones está cerrado. Los productos y pedidos se administran desde Firebase Console.
-
-La web se publica en Vercel y usa el plan gratuito Spark de Firebase. No se activaron Firebase Hosting, Authentication, pagos ni envíos reales.
-
-## Formulario de pedido
-
-La ruta /finalizar-compra contiene un formulario controlado. Checkout maneja estado, validación y onSubmit; CheckoutForm presenta el formulario y FormField reutiliza los campos y sus errores. Al confirmar, una transacción verifica los precios vigentes y crea un pedido de demostración con una referencia única. El carrito se vacía solo si el guardado termina correctamente. Usar datos ficticios para las pruebas.
-
-## Interfaz
-
-Las categorías del inicio abren el catálogo con el filtro correspondiente; el filtro se conserva en la URL. Los enlaces de ayuda llevan a /pedidos-y-entregas, /privacidad y /contacto. ContactForm prepara una consulta en la aplicación de correo del visitante; el envío se completa desde allí. La presentación usa la paleta crema y marrón, tipografía editorial y controles compartidos. Las tarjetas de personas representan perfiles ilustrativos. ItemCount permite opcionalmente mostrar una papelera; en el detalle se puede bajar la selección a cero y eliminar el producto del carrito.
+Los pedidos son de prueba: no hay pagos ni envíos reales.
